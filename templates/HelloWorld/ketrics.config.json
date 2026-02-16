@@ -1,0 +1,19 @@
+{
+  "name": "app3",
+  "version": "1.0.0",
+  "description": "My Ketrics application",
+  "runtime": "nodejs18",
+  "actions": [
+    "read",
+    "write"
+  ],
+  "entry": "dist/index.js",
+  "include": [
+    "dist/**/*"
+  ],
+  "exclude": [
+    "node_modules",
+    "*.test.js",
+    "*.spec.js"
+  ]
+}

@@ -1,0 +1,58 @@
+name: Validate Templates
+
+on:
+  pull_request:
+    paths:
+      - 'templates/**'
+      - 'templates.json'
+  push:
+    branches: [main]
+    paths:
+      - 'templates/**'
+      - 'templates.json'
+
+jobs:
+  validate-manifest:
+    name: Validate manifest
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+
+      - name: Validate templates.json
+        run: node scripts/validate-manifest.js
+
+  validate-templates:
+    name: Validate templates
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        template: [HelloWorld, Blank]
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+
+      - name: Validate template structure
+        run: node scripts/validate-templates.js ${{ matrix.template }}
+
+      - name: Install backend dependencies
+        working-directory: templates/${{ matrix.template }}/backend
+        run: npm install
+
+      - name: Build backend
+        working-directory: templates/${{ matrix.template }}/backend
+        run: npm run build
+
+      - name: Install frontend dependencies
+        working-directory: templates/${{ matrix.template }}/frontend
+        run: npm install
+
+      - name: Build frontend
+        working-directory: templates/${{ matrix.template }}/frontend
+        run: npm run build

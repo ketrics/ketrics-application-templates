@@ -1,0 +1,51 @@
+name: Deploy to Ketrics
+
+on:
+  push:
+    branches: [master]
+
+env:
+  KETRICS_API_URL: https://api.ketrics.io/api/v1
+  KETRICS_RUNTIME_URL: https://runtime.ketrics.io
+  KETRICS_TENANT_ID: KETRICS_TENANT_ID
+  KETRICS_APPLICATION_ID: KETRICS_APPLICATION_ID
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment: prod
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 18
+
+      # Install Ketrics CLI
+      - run: npm install -g @ketrics/ketrics-cli
+
+      # Generate .env file (only KETRICS_TOKEN is a secret)
+      - name: Generate .env file
+        run: |
+          cat <<EOF > .env
+          KETRICS_API_URL=$KETRICS_API_URL
+          KETRICS_RUNTIME_URL=$KETRICS_RUNTIME_URL
+          KETRICS_TENANT_ID=$KETRICS_TENANT_ID
+          KETRICS_APPLICATION_ID=$KETRICS_APPLICATION_ID
+          KETRICS_TOKEN=${{ secrets.KETRICS_TOKEN }}
+          EOF
+
+      # Backend: install + build
+      - run: npm ci
+        working-directory: backend
+      - run: npm run build
+        working-directory: backend
+
+      # Frontend: install + build
+      - run: npm ci
+        working-directory: frontend
+      - run: npm run build
+        working-directory: frontend
+
+      # Deploy
+      - run: ketrics deploy --env .env

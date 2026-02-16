@@ -1,0 +1,23 @@
+{
+  "displayName": "Blank",
+  "description": "Minimal starter template with a single echo handler. Use this as a clean starting point for new applications.",
+  "author": "Ketrics",
+  "sdkVersion": "0.11.0",
+  "placeholders": {
+    "APP_NAME": {
+      "description": "Application name",
+      "files": [
+        "ketrics.config.json",
+        "frontend/package.json",
+        "backend/package.json"
+      ],
+      "jsonField": "name"
+    }
+  },
+  "ignore": [
+    "node_modules",
+    ".git",
+    "dist",
+    "package-lock.json"
+  ]
+}

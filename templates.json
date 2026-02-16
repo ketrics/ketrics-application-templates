@@ -1,0 +1,21 @@
+{
+  "version": 1,
+  "templates": [
+    {
+      "name": "HelloWorld",
+      "description": "Complete reference app with all SDK features",
+      "path": "templates/HelloWorld",
+      "minCliVersion": "0.5.0",
+      "minSdkVersion": "0.11.0",
+      "tags": ["full", "reference"]
+    },
+    {
+      "name": "Blank",
+      "description": "Minimal app with just the essentials",
+      "path": "templates/Blank",
+      "minCliVersion": "0.5.0",
+      "minSdkVersion": "0.11.0",
+      "tags": ["minimal", "starter"]
+    }
+  ]
+}

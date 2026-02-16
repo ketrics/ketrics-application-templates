@@ -1,0 +1,18 @@
+{
+  "name": "app3",
+  "version": "1.0.0",
+  "description": "My Ketrics application backend",
+  "main": "dist/index.js",
+  "scripts": {
+    "build": "esbuild src/index.ts --bundle --platform=node --target=es2020 --outfile=dist/index.js",
+    "dev": "ts-node src/index.ts",
+    "clean": "rm -rf dist"
+  },
+  "devDependencies": {
+    "@ketrics/sdk-backend": "0.11.0",
+    "@types/node": ">=24.0.0",
+    "esbuild": "^0.27.2",
+    "ts-node": "^1.7.1",
+    "typescript": "^5.3.3"
+  }
+}

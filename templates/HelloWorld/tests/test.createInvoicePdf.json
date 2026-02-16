@@ -1,0 +1,18 @@
+{
+  "endpoint": "/tenants/{{tenantId}}/applications/{{applicationId}}/functions/createInvoicePdf",
+  "method": "POST",
+  "headers": {
+    "Authorization": "Bearer {{token}}",
+    "Content-Type": "application/json"
+  },
+  "body": {
+    "payload": {
+      "invoiceNumber": "INV-100",
+      "customerName": "Acme Corp",
+      "items": [
+        { "description": "Consulting", "quantity": 10, "price": 200 },
+        { "description": "Development", "quantity": 40, "price": 150 }
+      ]
+    }
+  }
+}
