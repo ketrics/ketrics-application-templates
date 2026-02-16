@@ -7,8 +7,6 @@ on:
 env:
   KETRICS_API_URL: https://api.ketrics.io/api/v1
   KETRICS_RUNTIME_URL: https://runtime.ketrics.io
-  KETRICS_TENANT_ID: KETRICS_TENANT_ID
-  KETRICS_APPLICATION_ID: KETRICS_APPLICATION_ID
 
 jobs:
   deploy:
@@ -30,8 +28,8 @@ jobs:
           cat <<EOF > .env
           KETRICS_API_URL=$KETRICS_API_URL
           KETRICS_RUNTIME_URL=$KETRICS_RUNTIME_URL
-          KETRICS_TENANT_ID=$KETRICS_TENANT_ID
-          KETRICS_APPLICATION_ID=$KETRICS_APPLICATION_ID
+          KETRICS_TENANT_ID=${{ vars.KETRICS_TENANT_ID }}
+          KETRICS_APPLICATION_ID=${{ vars.KETRICS_APPLICATION_ID }}
           KETRICS_TOKEN=${{ secrets.KETRICS_TOKEN }}
           EOF
 
