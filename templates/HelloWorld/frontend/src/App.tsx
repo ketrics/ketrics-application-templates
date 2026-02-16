@@ -25,8 +25,8 @@ function App() {
     setError(null);
     setResult(null);
     try {
-      const data = await apiClient.run(fnName, payload);
-      const downloadUrl = data?.result?.downloadUrl;
+      const data = (await apiClient.run(fnName, payload)) as Record<string, unknown> | undefined;
+      const downloadUrl = (data?.result as Record<string, unknown> | undefined)?.downloadUrl as string | undefined;
       if (downloadUrl) {
         const link = document.createElement("a");
         link.href = downloadUrl;
@@ -93,10 +93,18 @@ function App() {
             <button onClick={() => runFunction("queryUsers", { limit: 5 })} className="button" disabled={loading}>
               Query Users
             </button>
-            <button onClick={() => runFunction("insertRecord", { name: "Test User", email: "test@example.com" })} className="button" disabled={loading}>
+            <button
+              onClick={() => runFunction("insertRecord", { name: "Test User", email: "test@example.com" })}
+              className="button"
+              disabled={loading}
+            >
               Insert Record
             </button>
-            <button onClick={() => runFunction("transferFunds", { fromAccountId: 1, toAccountId: 2, amount: 100 })} className="button" disabled={loading}>
+            <button
+              onClick={() => runFunction("transferFunds", { fromAccountId: 1, toAccountId: 2, amount: 100 })}
+              className="button"
+              disabled={loading}
+            >
               Transfer Funds
             </button>
           </div>
@@ -123,7 +131,11 @@ function App() {
         <div className="section">
           <h2>Messaging & Jobs</h2>
           <div className="button-group">
-            <button onClick={() => runFunction("sendNotification", { subject: "Test", body: "Hello from the app!" })} className="button" disabled={loading}>
+            <button
+              onClick={() => runFunction("sendNotification", { subject: "Test", body: "Hello from the app!" })}
+              className="button"
+              disabled={loading}
+            >
               Send Notification
             </button>
             <button onClick={() => runFunction("scheduleBackgroundJob")} className="button" disabled={loading}>
