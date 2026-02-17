@@ -1,8 +1,13 @@
 name: Deploy to Ketrics
 
 on:
+  workflow_dispatch:
   push:
     branches: [master]
+    paths:
+      - "backend/**"
+      - "frontend/**"
+      - "ketrics.config.json"
 
 env:
   KETRICS_API_URL: https://api.ketrics.io/api/v1
