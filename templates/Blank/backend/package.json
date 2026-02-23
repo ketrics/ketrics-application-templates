@@ -9,7 +9,7 @@
     "clean": "rm -rf dist"
   },
   "devDependencies": {
-    "@ketrics/sdk-backend": "0.11.0",
+    "@ketrics/sdk-backend": "0.13.0",
     "@types/node": ">=24.0.0",
     "esbuild": "^0.27.2",
     "ts-node": "^1.7.1",
