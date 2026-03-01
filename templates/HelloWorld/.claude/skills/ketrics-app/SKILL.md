@@ -124,7 +124,7 @@ export { myHandler };
 mkdir -p frontend/src/services frontend/src/mocks
 cd frontend
 npm init -y
-npm install react react-dom @ketrics/sdk-frontend
+npm install react react-dom @ketrics/sdk-frontend lucide-react
 npm install -D @vitejs/plugin-react vite typescript @types/react @types/react-dom
 ```
 
@@ -174,14 +174,20 @@ try {
 
 ### DocumentDB (NoSQL storage)
 
-DynamoDB-style pk/sk model with `put`, `get`, `delete`, `list` operations.
+DynamoDB-style pk/sk model with `put`, `get`, `delete`, `list` operations. Supports cursor-based pagination.
 
 ```typescript
 const docdb = await ketrics.DocumentDb.connect(resourceCode);
 await docdb.put(pk, sk, item);
 const item = await docdb.get(pk, sk);
-const result = await docdb.list(pk, { skPrefix: "PREFIX#" });
+const result = await docdb.list(pk, { skPrefix: "PREFIX#", limit: 50 });
+// result.items: Record<string, unknown>[], result.cursor: string | undefined
 await docdb.delete(pk, sk);
+
+// Pagination: pass cursor from previous result to get next page
+if (result.cursor) {
+  const nextPage = await docdb.list(pk, { skPrefix: "PREFIX#", limit: 50, cursor: result.cursor });
+}
 ```
 
 ### Excel generation

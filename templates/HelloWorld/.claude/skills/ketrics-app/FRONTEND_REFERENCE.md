@@ -285,6 +285,7 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
   },
   "dependencies": {
     "@ketrics/sdk-frontend": "^0.3.0",
+    "lucide-react": "^0.400.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0"
   },
@@ -297,6 +298,75 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
   }
 }
 ```
+
+## Icons with Lucide React
+
+Use [lucide-react](https://lucide.dev) for icons. It provides a comprehensive set of clean, consistent SVG icons as React components.
+
+### Installation
+
+```bash
+npm install lucide-react
+```
+
+### Basic usage
+
+Import icons individually — each icon is tree-shakeable:
+
+```typescript
+import { Plus, Trash2, Edit, Search, ChevronDown, Loader2 } from "lucide-react";
+
+// Use as JSX components with optional size and color props
+<Plus size={16} />
+<Trash2 size={18} color="red" />
+<Search size={20} strokeWidth={1.5} />
+```
+
+### Common icon patterns
+
+```typescript
+// Button with icon
+<button onClick={handleCreate}>
+  <Plus size={16} /> Create Item
+</button>
+
+// Icon-only button (e.g., delete action in a table row)
+<button onClick={() => handleDelete(item.id)} title="Delete">
+  <Trash2 size={16} />
+</button>
+
+// Loading spinner
+{loading && <Loader2 size={20} className="animate-spin" />}
+
+// Status indicators
+{item.status === "active" ? <CheckCircle size={16} color="green" /> : <XCircle size={16} color="red" />}
+
+// Collapsible section toggle
+<button onClick={() => setExpanded(!expanded)}>
+  {expanded ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
+  Details
+</button>
+```
+
+### Frequently used icons
+
+| Icon | Import | Use case |
+|------|--------|----------|
+| `Plus` | `lucide-react` | Create / Add actions |
+| `Trash2` | `lucide-react` | Delete actions |
+| `Edit` | `lucide-react` | Edit actions (alias: `Pencil`) |
+| `Search` | `lucide-react` | Search inputs |
+| `Loader2` | `lucide-react` | Loading spinners (add `animate-spin`) |
+| `CheckCircle` | `lucide-react` | Success / active status |
+| `XCircle` | `lucide-react` | Error / inactive status |
+| `AlertTriangle` | `lucide-react` | Warnings |
+| `Download` | `lucide-react` | Export / download actions |
+| `Upload` | `lucide-react` | Import / upload actions |
+| `ChevronDown` / `ChevronUp` | `lucide-react` | Expand / collapse toggles |
+| `ArrowLeft` | `lucide-react` | Back navigation |
+| `Settings` | `lucide-react` | Configuration views |
+| `Eye` / `EyeOff` | `lucide-react` | Visibility toggles |
+| `Filter` | `lucide-react` | Filter controls |
 
 ## Common frontend patterns
 

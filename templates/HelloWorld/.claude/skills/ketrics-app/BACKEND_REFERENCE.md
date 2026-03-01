@@ -256,6 +256,53 @@ const result = await docdb.list(`USER#${userId}`, {
   limit: 100,                // Max items to return
 });
 // result.items: Record<string, unknown>[]
+// result.cursor: string | undefined — present when more results exist
+```
+
+### Pagination with cursor
+
+When a `list()` call returns more items than the `limit`, the response includes a `cursor` string. Pass it back to fetch the next page:
+
+```typescript
+const docdb = await ketrics.DocumentDb.connect(resourceCode);
+
+// First page
+const page1 = await docdb.list("users", { limit: 50 });
+
+// Next page (if cursor exists)
+if (page1.cursor) {
+  const page2 = await docdb.list("users", { limit: 50, cursor: page1.cursor });
+}
+```
+
+### Fetching all pages
+
+Loop until there is no cursor to collect every item:
+
+```typescript
+const fetchAll = async (pk: string, options: { skPrefix?: string; limit?: number } = {}) => {
+  const docdb = await ketrics.DocumentDb.connect(getDocDbCode());
+  const allItems: Record<string, unknown>[] = [];
+  let cursor: string | undefined;
+
+  do {
+    const result = await docdb.list(pk, { ...options, cursor });
+    allItems.push(...result.items);
+    cursor = result.cursor;
+  } while (cursor);
+
+  return allItems;
+};
+```
+
+### Query on secondary index with pagination
+
+```typescript
+const result = await docdb.query("status#active", {
+  limit: 100,
+  cursor: someCursor,  // from a previous query result
+});
+// result.items, result.cursor
 ```
 
 ### Delete
