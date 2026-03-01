@@ -707,6 +707,166 @@ if (result.success) {
 
 Store app codes in environment variables so they can be configured per-tenant without code changes.
 
+## ketrics.http
+
+HTTP client for making external API requests. Supports `get`, `post`, `put`, and `delete` methods.
+
+### GET — Fetch a resource
+
+```typescript
+const getUser = async (payload: { userId: string }) => {
+  const { userId } = payload;
+
+  const response = await ketrics.http.get(`https://api.example.com/users/${userId}`);
+
+  if (response.status !== 200) {
+    return { success: false, status: response.status, error: response.statusText };
+  }
+
+  return { success: true, user: response.data };
+};
+```
+
+### GET — With query params and custom headers
+
+```typescript
+const searchUsers = async (payload: { query: string; page?: number; apiKey: string }) => {
+  const { query, page = 1, apiKey } = payload;
+
+  const response = await ketrics.http.get("https://api.example.com/users", {
+    params: { q: query, page, limit: 20 },
+    headers: { Authorization: `Bearer ${apiKey}` },
+    timeout: 10000, // 10s instead of the default 30s
+  });
+
+  return {
+    results: response.data,
+    status: response.status,
+    headers: response.headers,
+  };
+};
+```
+
+### POST — Create a resource with a JSON body
+
+```typescript
+const createOrder = async (payload: { customerId: string; items: unknown[]; apiKey: string }) => {
+  const { customerId, items, apiKey } = payload;
+
+  const response = await ketrics.http.post("https://api.example.com/orders", {
+    customerId,
+    items,
+    createdAt: new Date().toISOString(),
+  }, {
+    headers: {
+      Authorization: `Bearer ${apiKey}`,
+      "Content-Type": "application/json",
+    },
+  });
+
+  if (response.status === 201) {
+    return { success: true, orderId: response.data.id };
+  }
+
+  return { success: false, status: response.status, error: response.data };
+};
+```
+
+### PUT — Update a resource
+
+```typescript
+const updateUser = async (payload: { userId: string; name: string; email: string; apiKey: string }) => {
+  const { userId, name, email, apiKey } = payload;
+
+  const response = await ketrics.http.put(`https://api.example.com/users/${userId}`, {
+    name,
+    email,
+  }, {
+    headers: { Authorization: `Bearer ${apiKey}` },
+  });
+
+  return { success: response.status === 200, data: response.data };
+};
+```
+
+### DELETE — Remove a resource
+
+```typescript
+const deleteUser = async (payload: { userId: string; apiKey: string }) => {
+  const { userId, apiKey } = payload;
+
+  const response = await ketrics.http.delete(`https://api.example.com/users/${userId}`, {
+    headers: { Authorization: `Bearer ${apiKey}` },
+  });
+
+  return { success: response.status === 204 };
+};
+```
+
+### Full workflow — Chaining multiple requests
+
+```typescript
+const syncCustomerData = async (payload: { externalApiUrl: string; apiKey: string }) => {
+  const { externalApiUrl, apiKey } = payload;
+
+  // 1. Fetch customers from external system
+  const listResponse = await ketrics.http.get(`${externalApiUrl}/customers`, {
+    headers: { Authorization: `Bearer ${apiKey}` },
+    params: { status: "active", limit: 100 },
+  });
+
+  if (listResponse.status !== 200) {
+    return { success: false, error: `Failed to fetch customers: ${listResponse.statusText}` };
+  }
+
+  const customers = listResponse.data;
+
+  // 2. Post each customer to our internal API
+  const results = [];
+  for (const customer of customers) {
+    const saveResponse = await ketrics.http.post("https://internal-api.example.com/customers", {
+      externalId: customer.id,
+      name: customer.name,
+      email: customer.email,
+    });
+
+    results.push({
+      externalId: customer.id,
+      status: saveResponse.status,
+      saved: saveResponse.status === 201,
+    });
+  }
+
+  return {
+    success: true,
+    total: customers.length,
+    saved: results.filter((r) => r.saved).length,
+    failed: results.filter((r) => !r.saved).length,
+  };
+};
+```
+
+### Response object
+
+All methods return a response object with:
+
+```typescript
+response.status     // number — HTTP status code (200, 201, 404, etc.)
+response.statusText // string — HTTP status text ("OK", "Created", etc.)
+response.data       // unknown — Parsed response body (JSON by default)
+response.headers    // Record<string, string> — Response headers
+```
+
+### Options
+
+```typescript
+{
+  params?: Record<string, unknown>;   // Query string parameters
+  headers?: Record<string, string>;   // Request headers
+  timeout?: number;                   // Timeout in ms (default: 30000)
+}
+```
+
 ## DocumentDB type casting pattern
 
 The SDK requires `Record<string, unknown>` for writes but returns it for reads. Use double casts:
