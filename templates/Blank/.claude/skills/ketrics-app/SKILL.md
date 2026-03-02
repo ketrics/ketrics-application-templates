@@ -256,6 +256,21 @@ const result = await app.invoke<PayloadType, ResponseType>("handlerName", payloa
 // result.success: boolean, result.result: ResponseType
 ```
 
+### HTTP client (external API requests)
+
+```typescript
+const response = await ketrics.http.get("https://api.example.com/users", {
+  params: { status: "active", limit: 20 },
+  headers: { Authorization: `Bearer ${apiKey}` },
+  timeout: 10000,
+});
+// response.status, response.statusText, response.data, response.headers
+
+await ketrics.http.post("https://api.example.com/orders", { customerId, items }, { headers });
+await ketrics.http.put(`https://api.example.com/users/${userId}`, { name, email }, { headers });
+await ketrics.http.delete(`https://api.example.com/users/${userId}`, { headers });
+```
+
 ### Application context
 
 ```typescript
