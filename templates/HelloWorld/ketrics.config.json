@@ -3,10 +3,6 @@
   "version": "1.0.0",
   "description": "My Ketrics application",
   "runtime": "nodejs18",
-  "actions": [
-    "read",
-    "write"
-  ],
   "entry": "dist/index.js",
   "include": [
     "dist/**/*"
@@ -15,5 +11,99 @@
     "node_modules",
     "*.test.js",
     "*.spec.js"
+  ],
+  "actions": [
+    {
+      "code": "read",
+      "description": "View data, list stored files and check background job status"
+    },
+    {
+      "code": "write",
+      "description": "Create and modify records, files and notifications"
+    },
+    {
+      "code": "export",
+      "description": "Generate PDF and Excel documents"
+    },
+    {
+      "code": "approve",
+      "description": "Authorise transfers of funds between accounts"
+    }
+  ],
+  "functions": [
+    "echo",
+    "info",
+    "saveFile",
+    "readFile",
+    "listFiles",
+    "generateDownloadUrl",
+    "copyFile",
+    "queryUsers",
+    "insertRecord",
+    "transferFunds",
+    "createInvoicePdf",
+    "createSimplePdf",
+    "createSpreadsheet",
+    "exportDataToExcel",
+    "getSecret",
+    "sendNotification",
+    "sendBulkNotification",
+    "scheduleBackgroundJob",
+    "getJobStatus",
+    "fetchExternalApi"
+  ],
+  "environment": [
+    {
+      "name": "DEMO_VOLUME",
+      "description": "Volume code used by the file, PDF and Excel handlers"
+    },
+    {
+      "name": "DATABASE_CONNECTION",
+      "description": "Code of the SQL data connection used by the database handlers"
+    }
+  ],
+  "resources": {
+    "volume": [
+      {
+        "code": "test-volume",
+        "description": "Demo file storage for saved files, PDFs and spreadsheets",
+        "environmentVariable": "DEMO_VOLUME"
+      }
+    ],
+    "secret": [
+      {
+        "code": "apikey",
+        "description": "Demo secret read by the getSecret handler (binds to the derived APIKEY_SECRET)"
+      }
+    ]
+  },
+  "roles": [
+    {
+      "code": "viewer",
+      "name": "Viewer",
+      "description": "Read-only access to the application",
+      "actions": [
+        "read"
+      ]
+    },
+    {
+      "code": "editor",
+      "name": "Editor",
+      "description": "Can read, modify data and generate exports",
+      "actions": [
+        "read",
+        "write",
+        "export"
+      ]
+    },
+    {
+      "code": "approver",
+      "name": "Approver",
+      "description": "Can read and authorise transfers, but not modify other data",
+      "actions": [
+        "read",
+        "approve"
+      ]
+    }
   ]
 }

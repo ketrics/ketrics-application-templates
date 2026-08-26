@@ -5,6 +5,8 @@
  * Background jobs run asynchronously and can have longer timeouts (up to 15 minutes).
  */
 
+import { requirePermission } from "./permissions";
+
 /**
  * Schedule a function to run in the background.
  */
@@ -12,6 +14,8 @@ const scheduleBackgroundJob = async (payload: {
   functionName?: string;
   data?: Record<string, unknown>;
 }) => {
+  requirePermission("write");
+
   const jobId = await ketrics.Job.runInBackground({
     function: payload?.functionName || "echo",
     payload: payload?.data || { source: "background-job" },
@@ -27,6 +31,8 @@ const scheduleBackgroundJob = async (payload: {
  * Check the status of a background job.
  */
 const getJobStatus = async (payload: { jobId: string }) => {
+  requirePermission("read");
+
   if (!payload?.jobId) {
     throw new Error("jobId is required");
   }

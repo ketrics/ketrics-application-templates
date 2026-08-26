@@ -17,7 +17,16 @@
  * - ketrics.Pdf.create() / ketrics.Pdf.read(buffer) (PDF documents)
  * - ketrics.Job.runInBackground(params) (background job execution)
  * - ketrics.Messages.send(params) (user messaging)
+ *
+ * Resource codes are never hardcoded: they are read from ketrics.environment
+ * through the helpers in ./config, using the variables declared in
+ * ketrics.config.json.
+ *
+ * Handlers are guarded with requirePermission() from ./permissions, whose
+ * capabilities mirror the "actions" declared in ketrics.config.json.
  */
+
+import { requirePermission } from "./permissions";
 
 // Volume examples: save, read, list, download URL, copy files
 import {
@@ -68,6 +77,8 @@ import { fetchExternalApi } from "./http";
  * Useful for debugging and verifying SDK access.
  */
 const echo = async (payload: unknown) => {
+  requirePermission("read");
+
   ketrics.console.log(
     `Echo called by ${ketrics.requestor.type}:${ketrics.requestor.userId || ketrics.requestor.serviceAccountCode}`,
   );
@@ -88,6 +99,8 @@ const echo = async (payload: unknown) => {
  * Info handler - returns runtime environment details.
  */
 const info = async () => {
+  requirePermission("read");
+
   return {
     tenant: { id: ketrics.tenant.id, code: ketrics.tenant.code, name: ketrics.tenant.name },
     application: {

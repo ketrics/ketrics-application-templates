@@ -5,10 +5,15 @@
  * Generated workbooks can be saved to a volume for download.
  */
 
+import { demoVolumeCode } from "./config";
+import { requirePermission } from "./permissions";
+
 /**
  * Create a spreadsheet with headers and sample data.
  */
 const createSpreadsheet = async () => {
+  requirePermission("export");
+
   const workbook = ketrics.Excel.create();
 
   // Create a worksheet with column definitions
@@ -38,7 +43,7 @@ const createSpreadsheet = async () => {
 
   // Save to volume
   const buffer = await workbook.toBuffer();
-  const volume = await ketrics.Volume.connect("test-volume");
+  const volume = await ketrics.Volume.connect(demoVolumeCode());
   const result = await volume.put("reports/employees.xlsx", buffer, {
     contentType: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
   });
@@ -59,6 +64,8 @@ const createSpreadsheet = async () => {
  * workbook with a summary sheet and a data sheet.
  */
 const exportDataToExcel = async (payload: { title?: string }) => {
+  requirePermission("export");
+
   const title = payload?.title || "Data Export";
 
   const workbook = ketrics.Excel.create();
@@ -99,7 +106,7 @@ const exportDataToExcel = async (payload: { title?: string }) => {
 
   // Save to volume
   const buffer = await workbook.toBuffer();
-  const volume = await ketrics.Volume.connect("test-volume");
+  const volume = await ketrics.Volume.connect(demoVolumeCode());
   const fileName = `reports/export-${Date.now()}.xlsx`;
   const result = await volume.put(fileName, buffer, {
     contentType: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",

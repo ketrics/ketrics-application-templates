@@ -5,11 +5,17 @@
  * Secrets must be created and granted to the application in the Ketrics portal.
  */
 
+import { apiKeySecretCode } from "./config";
+import { requirePermission } from "./permissions";
+
 /**
  * Retrieve an encrypted secret by code.
+ * Defaults to the secret declared in ketrics.config.json (APIKEY_SECRET).
  */
 const getSecret = async (payload: { code?: string }) => {
-  const secretCode = payload?.code || "apikey";
+  requirePermission("read");
+
+  const secretCode = payload?.code || apiKeySecretCode();
   const value = await ketrics.Secret.get(secretCode);
 
   // In production, never return the secret value directly.

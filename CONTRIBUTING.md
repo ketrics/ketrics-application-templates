@@ -13,11 +13,13 @@ templates/
     ├── template.json          # Required: Template metadata and placeholders
     ├── README.md              # Required: Template documentation
     ├── .env.example           # Required: Environment variables template
+    ├── .npmrc                 # Required: engine-strict=true
     ├── backend/
     │   ├── package.json
     │   ├── tsconfig.json
     │   └── src/
-    │       └── index.ts       # Handler functions
+    │       ├── index.ts       # Handler functions
+    │       └── permissions.ts # PERMISSIONS + typed requirePermission guard
     ├── frontend/
     │   ├── package.json
     │   ├── tsconfig.json
@@ -75,7 +77,59 @@ Every template must include a `template.json` file with metadata and placeholder
 | `placeholders` | Yes | Defines which files and fields get customized (at minimum, `APP_NAME`) |
 | `ignore` | Yes | Files/directories to exclude when copying |
 
-### 3. Update `templates.json`
+### 3. Create `ketrics.config.json`
+
+This file is what the App Deployment Lambda reads to sync the Application record, so a template's config is the example every generated app inherits. Get it right:
+
+```json
+{
+  "name": "app",
+  "version": "1.0.0",
+  "description": "My Ketrics application",
+  "runtime": "nodejs18",
+  "entry": "dist/index.js",
+  "include": ["dist/**/*"],
+  "exclude": ["node_modules", "*.test.js", "*.spec.js"],
+  "actions": [
+    { "code": "read", "description": "View application data" },
+    { "code": "write", "description": "Create and modify application data" }
+  ],
+  "functions": ["echo"],
+  "environment": [
+    { "name": "WELCOME_MESSAGE", "description": "Example variable" }
+  ],
+  "resources": {
+    "volume": [{ "code": "files", "description": "File storage" }]
+  },
+  "roles": [
+    { "code": "viewer", "name": "Viewer", "actions": ["read"] },
+    { "code": "editor", "name": "Editor", "actions": ["read", "write"] }
+  ]
+}
+```
+
+**Fields:**
+
+| Field                                             | Required | Description                                                                                                                                        |
+| ------------------------------------------------- | -------- | -------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `name`, `version`, `runtime`, `entry`, `include`  | Yes      | Identity, runtime and packaging                                                                                                                    |
+| `description`, `exclude`                          | No       | Description and packaging exclusions                                                                                                               |
+| `actions`                                         | Yes      | **Capabilities** roles grant and handlers check — `read`, `write`, `export`. Max 50. Never handler names. Each entry is a bare string or `{ code, description }` |
+| `functions`                                       | No       | Backend handler names exported from `backend/src/index.ts`                                                                                         |
+| `environment`                                     | No       | `{ name, description }` entries, max 50. `name` must match `/^[A-Z][A-Z0-9_]*$/` and be unique                                                     |
+| `resources`                                       | No       | `documentdb` / `volume` / `secret` arrays; each entry needs a `code` unique within its kind                                                         |
+| `roles`                                           | No       | Max 20. `code` unique and matching `/^[a-zA-Z][a-zA-Z0-9_-]*$/`, non-empty `name`, and `actions` drawn from the top-level `actions`                 |
+
+Rules to respect when authoring a template config:
+
+- **`actions` are capabilities, not handler names and not role names.** Handler names belong in `functions`; role names belong in `roles`. Listing handlers under `actions` pollutes every tenant's permission model.
+- **Ship a `backend/src/permissions.ts` whose `PERMISSIONS` matches `actions` exactly.** Every guarded handler calls `requirePermission(...)`; the typed parameter turns a typo into a compile error. `scripts/validate-templates.js` checks this pairing.
+- **Use `environment`, not `environmentVariables`.** The legacy key is now a hard deployment error.
+- **Resource bindings are optional.** `resources[].environmentVariable` may be omitted, in which case the name is derived — uppercase the `code`, non-alphanumerics to `_`, then `_DOCDB` / `_VOLUME` / `_SECRET` (`app-data` → `APP_DATA_DOCDB`, `exports` → `EXPORTS_VOLUME`). If you do declare it, it must also appear in `environment`.
+- **Declare only what the template actually uses.** Every declared variable — from `environment` or from a resource binding — is created empty on deploy and becomes mandatory: tenants cannot delete or rename it while the config declares it.
+- **Never hardcode resource codes in handler source**; read them from `ketrics.environment["VAR_NAME"]`.
+
+### 4. Update `templates.json`
 
 Add your template to the root `templates.json` manifest:
 
@@ -90,14 +144,19 @@ Add your template to the root `templates.json` manifest:
 }
 ```
 
-### 4. Ensure it builds
+### 5. Ensure it builds
 
-Before submitting, verify your template compiles:
+Before submitting, verify the manifest, the template structure and the builds:
 
 ```bash
+node scripts/validate-manifest.js
+node scripts/validate-templates.js YourTemplateName
+
 cd templates/YourTemplateName/backend && npm install && npm run build
 cd ../frontend && npm install && npm run build
 ```
+
+`npm run build` is esbuild, which bundles without type checking. Run `npx tsc --noEmit` in the backend as well if you want type errors surfaced.
 
 ## Updating an Existing Template
 
