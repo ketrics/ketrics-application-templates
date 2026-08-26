@@ -2,6 +2,9 @@
 
 Official starter templates for building applications on [Ketrics Cloud Analytics](https://www.ketrics.com). These templates are used by the `ketrics-cli` to scaffold new projects via `ketrics init`.
 
+> **Repository:** `ketrics/ketrics-application-templates` (branch: `main`)
+> The CLI fetches templates from `https://github.com/ketrics/ketrics-application-templates` on the `main` branch. It no longer bundles a copy of its own.
+
 ## Available Templates
 
 | Template       | Description                                                                                                                                                          | Tags                 |
@@ -37,7 +40,7 @@ Official starter templates for building applications on [Ketrics Cloud Analytics
 
 ## How It Works
 
-The `ketrics-cli` fetches `templates.json` from this repository to present available templates during `ketrics init`. When a user selects a template:
+The `ketrics-cli` fetches `templates.json` from `ketrics/ketrics-application-templates` (branch `main`) to present available templates during `ketrics init`. When a user selects a template:
 
 1. The template directory is downloaded and copied into the new project
 2. Placeholders defined in `template.json` (e.g., `APP_NAME`) are replaced with user-provided values in the target files
@@ -47,13 +50,53 @@ The `ketrics-cli` fetches `templates.json` from this repository to present avail
 
 Every template contains:
 
-| File                  | Purpose                                                                                             |
-| --------------------- | --------------------------------------------------------------------------------------------------- |
-| `ketrics.config.json` | Application configuration — name, version, runtime, actions, entry point, and include/exclude globs |
-| `template.json`       | Template metadata — display name, description, author, SDK version, placeholders, and ignored files |
-| `backend/`            | TypeScript handler functions that run on the Ketrics Runtime API                                    |
-| `frontend/`           | React + TypeScript + Vite frontend with mock handlers for local development                         |
-| `tests/`              | JSON files defining test request payloads for each backend function                                 |
+| File                  | Purpose                                                                                                                                                                              |
+| --------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `ketrics.config.json` | Application configuration — name, version, runtime, entry point, include/exclude globs, capabilities (`actions`), handler names (`functions`), `environment`, `resources` and `roles` |
+| `template.json`       | Template metadata — display name, description, author, SDK version, placeholders, and ignored files                                                                                  |
+| `backend/`            | TypeScript handler functions that run on the Ketrics Runtime API                                                                                                                     |
+| `frontend/`           | React + TypeScript + Vite frontend with mock handlers for local development                                                                                                          |
+| `tests/`              | JSON files defining test request payloads for each backend function                                                                                                                  |
+
+## ketrics.config.json
+
+Every template ships a `ketrics.config.json`. The App Deployment Lambda reads it on each deploy and syncs the Application record from it:
+
+```json
+{
+  "name": "app",
+  "version": "1.0.0",
+  "runtime": "nodejs18",
+  "entry": "dist/index.js",
+  "include": ["dist/**/*"],
+  "actions": [
+    { "code": "read", "description": "View application data" },
+    { "code": "write", "description": "Create and modify application data" }
+  ],
+  "functions": ["listItems", "createItem", "exportExcel"],
+  "environment": [
+    { "name": "SOFTLAND_API_URL", "description": "Base URL of the ERP API" }
+  ],
+  "resources": {
+    "volume": [{ "code": "exports", "description": "Excel and PDF exports" }]
+  },
+  "roles": [
+    { "code": "viewer", "name": "Viewer", "actions": ["read"] }
+  ]
+}
+```
+
+| Field         | Purpose                                                                                                                                                                                                              |
+| ------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `actions`     | **Capabilities** (`read`, `write`, `export`) — the vocabulary roles grant and handlers check with `requirePermission`. Required. Never handler names. Each entry is a bare string or `{ code, description }`          |
+| `functions`   | Backend handler names exported from `backend/src/index.ts` (metadata)                                                                                                                                                |
+| `environment` | Environment variables the app reads via `ketrics.environment["NAME"]`. Created empty on deploy, existing values never overwritten. Mandatory while declared: undeletable and unrenameable in the portal, values editable |
+| `resources`   | `documentdb` / `volume` / `secret` entries. Each has a `code`, an optional `description`, and an optional `environmentVariable`                                                                                       |
+| `roles`       | Application roles to create. Every action a role lists must appear in the top-level `actions`                                                                                                                        |
+
+When a resource omits `environmentVariable`, the platform derives the name: uppercase the `code`, replace non-alphanumerics with `_`, then append `_DOCDB`, `_VOLUME` or `_SECRET` — `app-data` (documentdb) → `APP_DATA_DOCDB`, `exports` (volume) → `EXPORTS_VOLUME`, `stripe-key` (secret) → `STRIPE_KEY_SECRET`. A derived name does not need an `environment` entry. When `environmentVariable` is given, it must be declared in `environment`.
+
+> **Renamed:** `environmentVariables` is now `environment`. The old key is rejected at deploy time rather than silently ignored.
 
 ## templates.json Manifest
 

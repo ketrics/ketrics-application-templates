@@ -25,7 +25,7 @@ jobs:
           node-version: 24
 
       # Install Ketrics CLI
-      - run: npm install -g @ketrics/ketrics-cli
+      - run: npm install -g @ketrics/ketrics-cli@^0.10
 
       # Generate .env file (only KETRICS_TOKEN is a secret)
       - name: Generate .env file

@@ -5,11 +5,16 @@
  * Volumes must be granted to the application in the Ketrics portal before use.
  */
 
+import { demoVolumeCode } from "./config";
+import { requirePermission } from "./permissions";
+
 /**
  * Save files to a volume - demonstrates writing JSON and binary data.
  */
 const saveFile = async () => {
-  const volume = await ketrics.Volume.connect("test-volume");
+  requirePermission("write");
+
+  const volume = await ketrics.Volume.connect(demoVolumeCode());
 
   // Write JSON content
   const jsonData = {
@@ -36,7 +41,9 @@ const saveFile = async () => {
  * Read a file from a volume - demonstrates reading and parsing stored data.
  */
 const readFile = async () => {
-  const volume = await ketrics.Volume.connect("test-volume");
+  requirePermission("read");
+
+  const volume = await ketrics.Volume.connect(demoVolumeCode());
 
   const exists = await volume.exists("output/data.json");
   if (!exists) {
@@ -58,7 +65,9 @@ const readFile = async () => {
  * List files in a volume - demonstrates pagination and prefix filtering.
  */
 const listFiles = async (payload: { prefix?: string }) => {
-  const volume = await ketrics.Volume.connect("test-volume");
+  requirePermission("read");
+
+  const volume = await ketrics.Volume.connect(demoVolumeCode());
 
   const result = await volume.list({
     prefix: payload?.prefix || "output/",
@@ -81,7 +90,9 @@ const listFiles = async (payload: { prefix?: string }) => {
  * Generate a temporary download URL for a file.
  */
 const generateDownloadUrl = async () => {
-  const volume = await ketrics.Volume.connect("test-volume");
+  requirePermission("read");
+
+  const volume = await ketrics.Volume.connect(demoVolumeCode());
   const result = await volume.generateDownloadUrl("output/data.json", {
     expiresIn: 3600, // 1 hour
   });
@@ -93,7 +104,9 @@ const generateDownloadUrl = async () => {
  * Copy a file within a volume.
  */
 const copyFile = async () => {
-  const volume = await ketrics.Volume.connect("test-volume");
+  requirePermission("write");
+
+  const volume = await ketrics.Volume.connect(demoVolumeCode());
 
   const result = await volume.copy("output/data.json", "backup/data-backup.json");
 

@@ -3,9 +3,6 @@
   "version": "1.0.0",
   "description": "My Ketrics application",
   "runtime": "nodejs18",
-  "actions": [
-    "echo"
-  ],
   "entry": "dist/index.js",
   "include": [
     "dist/**/*"
@@ -14,5 +11,51 @@
     "node_modules",
     "*.test.js",
     "*.spec.js"
+  ],
+  "actions": [
+    {
+      "code": "read",
+      "description": "View application data"
+    },
+    {
+      "code": "write",
+      "description": "Create and modify application data"
+    }
+  ],
+  "functions": [
+    "echo"
+  ],
+  "environment": [
+    {
+      "name": "WELCOME_MESSAGE",
+      "description": "Example variable, created empty on deploy — remove it from the config when unused"
+    }
+  ],
+  "resources": {
+    "volume": [
+      {
+        "code": "files",
+        "description": "File storage for the application (binds to the derived FILES_VOLUME)"
+      }
+    ]
+  },
+  "roles": [
+    {
+      "code": "viewer",
+      "name": "Viewer",
+      "description": "Read-only access to the application",
+      "actions": [
+        "read"
+      ]
+    },
+    {
+      "code": "editor",
+      "name": "Editor",
+      "description": "Can read and modify data",
+      "actions": [
+        "read",
+        "write"
+      ]
+    }
   ]
 }

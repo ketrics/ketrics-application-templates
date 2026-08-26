@@ -5,10 +5,14 @@
  * Messages appear in the user's inbox within the Ketrics portal.
  */
 
+import { requirePermission } from "./permissions";
+
 /**
  * Send a notification to the current user.
  */
 const sendNotification = async (payload: { subject?: string; body?: string }) => {
+  requirePermission("write");
+
   if (ketrics.requestor.type !== "USER") {
     throw new Error("This function can only be called by a user");
   }
@@ -36,6 +40,8 @@ const sendBulkNotification = async (payload: {
   subject: string;
   body: string;
 }) => {
+  requirePermission("write");
+
   if (!payload?.userIds?.length) {
     throw new Error("userIds array is required");
   }

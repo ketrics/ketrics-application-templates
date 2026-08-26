@@ -7,5 +7,8 @@ export default defineConfig({
   build: {
     outDir: "dist",
     sourcemap: false,
+    // src/services/index.ts awaits createClient() at the top level, which
+    // Vite's default target ("modules" — es2020) cannot transpile.
+    target: "es2022",
   },
 });

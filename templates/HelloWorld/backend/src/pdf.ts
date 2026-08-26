@@ -5,10 +5,15 @@
  * Generated PDFs can be saved to a volume for download.
  */
 
+import { demoVolumeCode } from "./config";
+import { requirePermission } from "./permissions";
+
 /**
  * Create a simple PDF document and save it to a volume.
  */
 const createSimplePdf = async () => {
+  requirePermission("export");
+
   const doc = await ketrics.Pdf.create();
 
   // Set document metadata
@@ -68,7 +73,7 @@ const createSimplePdf = async () => {
 
   // Save to volume
   const buffer = await doc.toBuffer();
-  const volume = await ketrics.Volume.connect("test-volume");
+  const volume = await ketrics.Volume.connect(demoVolumeCode());
   const result = await volume.put("documents/sample.pdf", buffer, {
     contentType: "application/pdf",
   });
@@ -93,6 +98,8 @@ const createInvoicePdf = async (payload: {
   customerName?: string;
   items?: Array<{ description: string; quantity: number; price: number }>;
 }) => {
+  requirePermission("export");
+
   const invoiceNumber = payload?.invoiceNumber || "INV-001";
   const customerName = payload?.customerName || "Sample Customer";
   const items = payload?.items || [
@@ -192,7 +199,7 @@ const createInvoicePdf = async (payload: {
 
   // Save to volume
   const buffer = await doc.toBuffer();
-  const volume = await ketrics.Volume.connect("test-volume");
+  const volume = await ketrics.Volume.connect(demoVolumeCode());
   const fileName = `invoices/${invoiceNumber}.pdf`;
   const result = await volume.put(fileName, buffer, {
     contentType: "application/pdf",

@@ -9,6 +9,8 @@ A starter template for building applications on the Ketrics platform, demonstrat
 ├── backend/               # TypeScript handlers for Runtime API
 │   └── src/
 │       ├── index.ts       # Main exports (echo, info)
+│       ├── permissions.ts # PERMISSIONS + typed requirePermission guard
+│       ├── config.ts      # Resource codes read from ketrics.environment
 │       ├── volumes.ts     # Volume storage examples
 │       ├── database.ts    # Database connection examples
 │       ├── pdf.ts         # PDF generation examples
@@ -92,6 +94,58 @@ cd frontend
 npm install
 npm run build
 ```
+
+## Application Configuration
+
+`ketrics.config.json` declares the app to the platform. The deployment lambda reads it and syncs
+the Application record:
+
+| Field | Purpose |
+| --- | --- |
+| `actions` | Capabilities (`read`, `write`, `export`, `approve`) — the vocabulary roles grant and handlers check. **Not** handler names. Each entry is a string or `{ code, description }` |
+| `functions` | Backend handler names exported from `backend/src/index.ts` |
+| `environment` | Environment variables the app reads via `ketrics.environment["NAME"]`. Created empty on deploy; mandatory while declared (undeletable and unrenameable in the portal, values editable) |
+| `resources` | DocumentDB / Volume / Secret resources. Each binds to an environment variable — explicit via `environmentVariable` (which must be declared in `environment`), or derived from the kind and code (`exports` volume → `EXPORTS_VOLUME`, `apikey` secret → `APIKEY_SECRET`) |
+| `roles` | Application roles to create; every action a role lists must appear in `actions` |
+
+> `environmentVariables` was renamed to `environment`. The old key now fails deployment instead
+> of being ignored.
+
+When adding a handler: export it from `backend/src/index.ts`, guard it with
+`requirePermission(...)`, and add its name to `functions`. Add to `actions` only when the handler
+needs a genuinely new capability — and then add the same code to `PERMISSIONS` in
+`backend/src/permissions.ts`, which is hand-synced with the config.
+
+### Permissions
+
+`backend/src/permissions.ts` declares the capabilities this app enforces and the typed guard
+handlers call. Because `requirePermission` takes a `Permission` and not a `string`, a typo is a
+compile error rather than a handler no role can reach.
+
+| Capability | Guards |
+| --- | --- |
+| `read` | `echo`, `info`, `readFile`, `listFiles`, `generateDownloadUrl`, `queryUsers`, `getSecret`, `getJobStatus`, `fetchExternalApi` |
+| `write` | `saveFile`, `copyFile`, `insertRecord`, `sendNotification`, `sendBulkNotification`, `scheduleBackgroundJob` |
+| `export` | `createSimplePdf`, `createInvoicePdf`, `createSpreadsheet`, `exportDataToExcel` |
+| `approve` | `transferFunds` |
+
+`transferFunds` is guarded by `approve` rather than `write` on purpose: moving funds is a
+capability you may want to grant separately from ordinary edits. The `approver` role in
+`ketrics.config.json` grants `read` and `approve` without `write`.
+
+### Required environment variables
+
+Resource codes are never hardcoded in this template. `backend/src/config.ts` reads them from
+`ketrics.environment` and throws a message naming the variable when one is unset, so configure
+these in the portal before running the handlers:
+
+| Variable | Bound to | Used by |
+| --- | --- | --- |
+| `DEMO_VOLUME` | `resources.volume` code `test-volume` | `saveFile`, `readFile`, `listFiles`, `generateDownloadUrl`, `copyFile`, both PDF handlers, both Excel handlers |
+| `APIKEY_SECRET` | `resources.secret` code `apikey` (derived name) | `getSecret` (unless the payload passes an explicit `code`) |
+| `DATABASE_CONNECTION` | `environment` entry — data connections are not a `resources` kind | `queryUsers`, `insertRecord`, `transferFunds` |
+
+All three are created empty on deploy and cannot be deleted or renamed while declared.
 
 ## Deploy
 

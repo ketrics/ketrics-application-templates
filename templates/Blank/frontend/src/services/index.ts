@@ -57,7 +57,11 @@ async function createClient(): Promise<APIClientInterface> {
   }
 
   const auth = createAuthManager();
-  auth.initAutoRefresh({
+  // Awaited: since SDK 0.5.0 the access token is held in memory and arrives
+  // from the parent window by postMessage, so getAccessToken() returns null
+  // until this resolves. It rejects if no token arrives, which is the right
+  // moment to fail — better than starting up and 401ing on every call.
+  await auth.initAutoRefresh({
     refreshBuffer: 60,
     onTokenUpdated: () => {},
   });

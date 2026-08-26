@@ -17,13 +17,20 @@
  * - ketrics.Pdf.create() / ketrics.Pdf.read(buffer) (PDF documents)
  * - ketrics.Job.runInBackground(params) (background job execution)
  * - ketrics.Messages.send(params) (user messaging)
+ *
+ * Handlers are guarded with requirePermission() from ./permissions, whose
+ * capabilities mirror the "actions" declared in ketrics.config.json.
  */
+
+import { requirePermission } from "./permissions";
 
 /**
  * Echo handler - returns the payload along with full context info.
  * Useful for debugging and verifying SDK access.
  */
 const echo = async (payload: unknown) => {
+  requirePermission("read");
+
   ketrics.console.log(
     `Echo called by ${ketrics.requestor.type}:${ketrics.requestor.userId || ketrics.requestor.serviceAccountCode}`,
   );

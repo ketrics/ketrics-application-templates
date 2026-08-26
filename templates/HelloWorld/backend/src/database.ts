@@ -5,13 +5,21 @@
  * Data connections must be configured and granted to the application in the Ketrics portal.
  *
  * Supports PostgreSQL, MySQL, SQL Server, and Oracle databases.
+ *
+ * The connection code comes from the DATABASE_CONNECTION environment variable
+ * declared in ketrics.config.json - never hardcode it.
  */
+
+import { databaseConnectionCode } from "./config";
+import { requirePermission } from "./permissions";
 
 /**
  * Query records from a database.
  */
 const queryUsers = async (payload: { limit?: number }) => {
-  const db = await ketrics.Database.connect("my-database");
+  requirePermission("read");
+
+  const db = await ketrics.Database.connect(databaseConnectionCode());
 
   try {
     const result = await db.query<{ id: number; name: string; email: string }>(
@@ -32,11 +40,13 @@ const queryUsers = async (payload: { limit?: number }) => {
  * Insert a record into a database.
  */
 const insertRecord = async (payload: { name: string; email: string }) => {
+  requirePermission("write");
+
   if (!payload?.name || !payload?.email) {
     throw new Error("name and email are required");
   }
 
-  const db = await ketrics.Database.connect("my-database");
+  const db = await ketrics.Database.connect(databaseConnectionCode());
 
   try {
     const result = await db.execute(
@@ -62,6 +72,8 @@ const transferFunds = async (payload: {
   toAccountId: number;
   amount: number;
 }) => {
+  requirePermission("approve");
+
   if (!payload?.fromAccountId || !payload?.toAccountId || !payload?.amount) {
     throw new Error("fromAccountId, toAccountId, and amount are required");
   }
@@ -70,7 +82,7 @@ const transferFunds = async (payload: {
     throw new Error("Amount must be positive");
   }
 
-  const db = await ketrics.Database.connect("my-database");
+  const db = await ketrics.Database.connect(databaseConnectionCode());
 
   try {
     const result = await db.transaction(async (tx) => {
