@@ -1,32 +1,56 @@
 /**
- * Ketrics Application Backend
+ * Ketrics Application Backend - entry point
  *
- * Exports handler functions compatible with Ketrics Runtime API.
+ * This file is a MANIFEST, not a place for logic. It does two jobs and only
+ * two: import handlers from domain files and re-export them. Every name in the
+ * "functions" array of ketrics.config.json must appear here, including
+ * background handlers prefixed with _.
+ *
+ * Handlers live in domain files alongside the private helpers they need. Add a
+ * new file per feature area rather than growing this one - esbuild bundles the
+ * whole src/ tree into a single dist/index.js, so multi-file source costs
+ * nothing at runtime.
  *
  * The `ketrics` global object is automatically typed via @ketrics/sdk-backend.
- * No imports needed - just use `ketrics.*` directly.
+ * No imports needed - just use `ketrics.*` directly:
  *
- * Available SDK features:
- * - ketrics.tenant, ketrics.application, ketrics.requestor, ketrics.runtime, ketrics.environment (context)
- * - ketrics.console (logging to CloudWatch)
+ * - ketrics.tenant, ketrics.application, ketrics.requestor, ketrics.runtime,
+ *   ketrics.environment (context)
+ * - ketrics.console (logging to CloudWatch; prefer ./logger, which gates on DEBUG_LEVEL)
  * - ketrics.http (HTTP client for external APIs)
+ * - ketrics.DocumentDb.connect(code) (NoSQL document storage)
  * - ketrics.Volume.connect(code) (S3-backed file storage)
- * - ketrics.Database.connect(code) (external SQL databases)
+ * - ketrics.Database.connect(code) (SQL data connections)
  * - ketrics.Secret.get(code) (encrypted secrets)
+ * - ketrics.Parameter.get(code) (shared, unencrypted JSON config)
  * - ketrics.Excel.create() / ketrics.Excel.read(buffer) (Excel workbooks)
  * - ketrics.Pdf.create() / ketrics.Pdf.read(buffer) (PDF documents)
  * - ketrics.Job.runInBackground(params) (background job execution)
  * - ketrics.Messages.send(params) (user messaging)
+ * - ketrics.Users.list() (tenant users)
  *
  * Resource codes are never hardcoded: they are read from ketrics.environment
- * through the helpers in ./config, using the variables declared in
- * ketrics.config.json.
+ * through the accessors in ./helpers, using the variables bound by the
+ * resources declared in ketrics.config.json.
  *
  * Handlers are guarded with requirePermission() from ./permissions, whose
  * capabilities mirror the "actions" declared in ketrics.config.json.
  */
 
-import { requirePermission } from "./permissions";
+// Permissions: capability report for permission-aware UI
+import { getPermissions } from "./permissions";
+
+// General: context and diagnostics
+import { echo, info } from "./general";
+
+// DocumentDB examples: pk/sk CRUD with cursor pagination
+import {
+  createDocument,
+  getDocument,
+  listDocuments,
+  updateDocument,
+  deleteDocument,
+} from "./documents";
 
 // Volume examples: save, read, list, download URL, copy files
 import {
@@ -59,64 +83,30 @@ import {
 // Secret management examples
 import { getSecret } from "./secrets";
 
-// Messaging examples
-import { sendNotification, sendBulkNotification } from "./messages";
+// Parameter examples: shared, unencrypted JSON configuration
+import { getAppSettings, getOptionalAppSettings } from "./parameters";
 
-// Background job examples
-import { scheduleBackgroundJob, getJobStatus } from "./jobs";
+// Messaging examples
+import { sendNotification, sendBulkNotification, listUsers } from "./messages";
+
+// Background job examples (_processInBackground is invoked by the platform)
+import { scheduleBackgroundJob, getJobStatus, _processInBackground } from "./jobs";
 
 // HTTP client examples
 import { fetchExternalApi } from "./http";
 
-// ============================================================================
-// Basic Handlers
-// ============================================================================
-
-/**
- * Echo handler - returns the payload along with full context info.
- * Useful for debugging and verifying SDK access.
- */
-const echo = async (payload: unknown) => {
-  requirePermission("read");
-
-  ketrics.console.log(
-    `Echo called by ${ketrics.requestor.type}:${ketrics.requestor.userId || ketrics.requestor.serviceAccountCode}`,
-  );
-
-  return {
-    payload,
-    context: {
-      tenant: ketrics.tenant,
-      application: ketrics.application,
-      requestor: ketrics.requestor,
-      runtime: ketrics.runtime,
-      environment: ketrics.environment,
-    },
-  };
-};
-
-/**
- * Info handler - returns runtime environment details.
- */
-const info = async () => {
-  requirePermission("read");
-
-  return {
-    tenant: { id: ketrics.tenant.id, code: ketrics.tenant.code, name: ketrics.tenant.name },
-    application: {
-      id: ketrics.application.id,
-      code: ketrics.application.code,
-      name: ketrics.application.name,
-      version: ketrics.application.version,
-    },
-    runtime: ketrics.runtime,
-  };
-};
-
 export {
-  // Basic
+  // Permissions
+  getPermissions,
+  // General
   echo,
   info,
+  // DocumentDB
+  createDocument,
+  getDocument,
+  listDocuments,
+  updateDocument,
+  deleteDocument,
   // Volumes
   saveFile,
   readFile,
@@ -135,12 +125,17 @@ export {
   exportDataToExcel,
   // Secrets
   getSecret,
+  // Parameters
+  getAppSettings,
+  getOptionalAppSettings,
   // Messages
   sendNotification,
   sendBulkNotification,
+  listUsers,
   // Jobs
   scheduleBackgroundJob,
   getJobStatus,
+  _processInBackground,
   // HTTP
   fetchExternalApi,
 };

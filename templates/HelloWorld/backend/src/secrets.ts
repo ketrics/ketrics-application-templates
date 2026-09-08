@@ -5,7 +5,7 @@
  * Secrets must be created and granted to the application in the Ketrics portal.
  */
 
-import { apiKeySecretCode } from "./config";
+import { apiKeySecretCode } from "./helpers";
 import { requirePermission } from "./permissions";
 
 /**

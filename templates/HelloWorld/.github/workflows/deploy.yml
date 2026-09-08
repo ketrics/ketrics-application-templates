@@ -24,8 +24,15 @@ jobs:
         with:
           node-version: 24
 
-      # Install Ketrics CLI
-      - run: npm install -g @ketrics/ketrics-cli@^0.10
+      # Install Ketrics CLI — ALWAYS pin the range.
+      # Unpinned, npm walks back to 0.1.0 on any Node older than 24: that CLI
+      # ships a ZIP with no ketrics.config.json and still reports success, so
+      # the app silently keeps its old actions, roles and variables while CI
+      # stays green. node-version 24 + this range + .npmrc engine-strict=true
+      # are what prevent it. The parameter and connection resource kinds need
+      # 0.14.0 or newer.
+      - run: npm install -g @ketrics/ketrics-cli@^0.14
+      - run: ketrics --version
 
       # Generate .env file (only KETRICS_TOKEN is a secret)
       - name: Generate .env file

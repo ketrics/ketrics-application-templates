@@ -1,5 +1,5 @@
 {
-  "name": "app3",
+  "name": "app",
   "version": "1.0.0",
   "description": "My Ketrics application",
   "runtime": "nodejs18",
@@ -31,8 +31,14 @@
     }
   ],
   "functions": [
+    "getPermissions",
     "echo",
     "info",
+    "createDocument",
+    "getDocument",
+    "listDocuments",
+    "updateDocument",
+    "deleteDocument",
     "saveFile",
     "readFile",
     "listFiles",
@@ -46,10 +52,14 @@
     "createSpreadsheet",
     "exportDataToExcel",
     "getSecret",
+    "getAppSettings",
+    "getOptionalAppSettings",
     "sendNotification",
     "sendBulkNotification",
+    "listUsers",
     "scheduleBackgroundJob",
     "getJobStatus",
+    "_processInBackground",
     "fetchExternalApi"
   ],
   "environment": [
@@ -58,11 +68,17 @@
       "description": "Volume code used by the file, PDF and Excel handlers"
     },
     {
-      "name": "DATABASE_CONNECTION",
-      "description": "Code of the SQL data connection used by the database handlers"
+      "name": "DEBUG_LEVEL",
+      "description": "Backend log verbosity: none | error | warn | info | debug (each level includes the levels above it). Unset defaults to error."
     }
   ],
   "resources": {
+    "documentdb": [
+      {
+        "code": "app-data",
+        "description": "Document store for the note CRUD handlers (binds to the derived APP_DATA_DOCDB)"
+      }
+    ],
     "volume": [
       {
         "code": "test-volume",
@@ -74,6 +90,18 @@
       {
         "code": "apikey",
         "description": "Demo secret read by the getSecret handler (binds to the derived APIKEY_SECRET)"
+      }
+    ],
+    "parameter": [
+      {
+        "code": "app-settings",
+        "description": "Shared, unencrypted JSON configuration read by the Parameter handlers (binds to the derived APP_SETTINGS_PARAMETER)"
+      }
+    ],
+    "connection": [
+      {
+        "code": "main-db",
+        "description": "SQL data connection queried by the database handlers (binds to the derived MAIN_DB_CONNECTION)"
       }
     ]
   },

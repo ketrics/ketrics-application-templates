@@ -1,8 +1,8 @@
 {
   "displayName": "Hello World",
-  "description": "Complete reference app demonstrating all Ketrics SDK features including volumes, databases, PDF/Excel generation, secrets, messaging, background jobs, and HTTP integrations.",
+  "description": "Complete reference app demonstrating all Ketrics SDK features including DocumentDB, volumes, SQL connections, parameters, secrets, PDF/Excel generation, messaging, background jobs, and HTTP integrations.",
   "author": "Ketrics",
-  "sdkVersion": "0.13.1",
+  "sdkVersion": "0.17.0",
   "placeholders": {
     "APP_NAME": {
       "description": "Application name",

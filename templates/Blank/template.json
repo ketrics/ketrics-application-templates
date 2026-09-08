@@ -1,8 +1,8 @@
 {
   "displayName": "Blank",
-  "description": "Minimal starter template with a single echo handler. Use this as a clean starting point for new applications.",
+  "description": "Minimal starter template with the domain-oriented backend layout, a typed permission guard and a permission-aware React UI. Use this as a clean starting point for new applications.",
   "author": "Ketrics",
-  "sdkVersion": "0.13.1",
+  "sdkVersion": "0.17.0",
   "placeholders": {
     "APP_NAME": {
       "description": "Application name",

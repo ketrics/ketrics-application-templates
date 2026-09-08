@@ -5,7 +5,7 @@
  * Generated PDFs can be saved to a volume for download.
  */
 
-import { demoVolumeCode } from "./config";
+import { attachmentDisposition, demoVolumeCode } from "./helpers";
 import { requirePermission } from "./permissions";
 
 /**
@@ -22,11 +22,11 @@ const createSimplePdf = async () => {
   doc.setCreator(ketrics.application.name);
 
   // Add a page
-  const page = doc.addPage({ size: "A4" });
+  const page = doc.addPage("A4");
 
   // Embed a standard font
   const font = await doc.embedStandardFont("Helvetica");
-  const boldFont = await doc.embedStandardFont("Helvetica-Bold");
+  const boldFont = await doc.embedStandardFont("HelveticaBold");
 
   // Draw title
   page.drawText("Hello from Ketrics!", {
@@ -78,9 +78,11 @@ const createSimplePdf = async () => {
     contentType: "application/pdf",
   });
 
-  // Generate download URL
+  // Generate download URL. responseContentDisposition is required — a presigned
+  // S3 URL without it is blocked by the iframe CSP and fails silently.
   const downloadUrl = await volume.generateDownloadUrl("documents/sample.pdf", {
     expiresIn: 3600,
+    responseContentDisposition: attachmentDisposition("sample.pdf"),
   });
 
   return {
@@ -112,9 +114,9 @@ const createInvoicePdf = async (payload: {
   doc.setTitle(`Invoice ${invoiceNumber}`);
   doc.setAuthor(ketrics.tenant.name);
 
-  const page = doc.addPage({ size: "A4" });
+  const page = doc.addPage("A4");
   const font = await doc.embedStandardFont("Helvetica");
-  const boldFont = await doc.embedStandardFont("Helvetica-Bold");
+  const boldFont = await doc.embedStandardFont("HelveticaBold");
 
   let y = 780;
 
@@ -200,12 +202,16 @@ const createInvoicePdf = async (payload: {
   // Save to volume
   const buffer = await doc.toBuffer();
   const volume = await ketrics.Volume.connect(demoVolumeCode());
-  const fileName = `invoices/${invoiceNumber}.pdf`;
+  const downloadName = `${invoiceNumber}.pdf`;
+  const fileName = `invoices/${downloadName}`;
   const result = await volume.put(fileName, buffer, {
     contentType: "application/pdf",
   });
 
-  const downloadUrl = await volume.generateDownloadUrl(fileName, { expiresIn: 3600 });
+  const downloadUrl = await volume.generateDownloadUrl(fileName, {
+    expiresIn: 3600,
+    responseContentDisposition: attachmentDisposition(downloadName),
+  });
 
   return {
     file: { key: result.key, size: result.size },
