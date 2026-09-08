@@ -41,6 +41,12 @@ h1 {
   margin-bottom: 20px;
 }
 
+.button-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
 .button {
   padding: 8px 16px;
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
@@ -65,6 +71,13 @@ h1 {
 .button:disabled {
   opacity: 0.6;
   cursor: not-allowed;
+}
+
+.loading {
+  color: #667eea;
+  font-weight: 500;
+  padding: 12px;
+  margin-top: 16px;
 }
 
 .error {

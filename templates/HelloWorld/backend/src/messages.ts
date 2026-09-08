@@ -62,4 +62,25 @@ const sendBulkNotification = async (payload: {
   };
 };
 
-export { sendNotification, sendBulkNotification };
+/**
+ * List the tenant's users, so the frontend can pick recipients for
+ * sendBulkNotification. Co-located with the handlers that need it rather than
+ * promoted to helpers.ts — only three or more domain files justify that move.
+ */
+const listUsers = async () => {
+  requirePermission("read");
+
+  const users = await ketrics.Users.list();
+
+  return {
+    users: users.map((user) => ({
+      id: user.id,
+      firstName: user.firstName,
+      lastName: user.lastName,
+      email: user.email,
+    })),
+    count: users.length,
+  };
+};
+
+export { sendNotification, sendBulkNotification, listUsers };

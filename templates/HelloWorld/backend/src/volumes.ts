@@ -5,7 +5,7 @@
  * Volumes must be granted to the application in the Ketrics portal before use.
  */
 
-import { demoVolumeCode } from "./config";
+import { attachmentDisposition, demoVolumeCode } from "./helpers";
 import { requirePermission } from "./permissions";
 
 /**
@@ -88,6 +88,11 @@ const listFiles = async (payload: { prefix?: string }) => {
 
 /**
  * Generate a temporary download URL for a file.
+ *
+ * ALWAYS pass responseContentDisposition. The frontend runs in an iframe under
+ * a strict `frame-src https://cdn.ketrics.io` CSP and presigned URLs point at
+ * the S3 host, so without a forced attachment the browser tries to navigate the
+ * iframe to S3, the CSP blocks it, and the download silently fails.
  */
 const generateDownloadUrl = async () => {
   requirePermission("read");
@@ -95,6 +100,7 @@ const generateDownloadUrl = async () => {
   const volume = await ketrics.Volume.connect(demoVolumeCode());
   const result = await volume.generateDownloadUrl("output/data.json", {
     expiresIn: 3600, // 1 hour
+    responseContentDisposition: attachmentDisposition("data.json"),
   });
 
   return { url: result.url, expiresAt: result.expiresAt };

@@ -23,22 +23,21 @@
     }
   ],
   "functions": [
-    "echo"
+    "getPermissions",
+    "echo",
+    "greet",
+    "notifyMe"
   ],
   "environment": [
     {
       "name": "WELCOME_MESSAGE",
-      "description": "Example variable, created empty on deploy — remove it from the config when unused"
+      "description": "Greeting template used by the greet handler. Supports {name} and {app} placeholders."
+    },
+    {
+      "name": "DEBUG_LEVEL",
+      "description": "Backend log verbosity: none | error | warn | info | debug (each level includes the levels above it). Unset defaults to error."
     }
   ],
-  "resources": {
-    "volume": [
-      {
-        "code": "files",
-        "description": "File storage for the application (binds to the derived FILES_VOLUME)"
-      }
-    ]
-  },
   "roles": [
     {
       "code": "viewer",

@@ -5,14 +5,13 @@
   "main": "dist/index.js",
   "scripts": {
     "build": "esbuild src/index.ts --bundle --platform=node --target=es2020 --outfile=dist/index.js",
-    "dev": "ts-node src/index.ts",
+    "typecheck": "tsc --noEmit",
     "clean": "rm -rf dist"
   },
   "devDependencies": {
-    "@ketrics/sdk-backend": "0.13.1",
+    "@ketrics/sdk-backend": "0.17.0",
     "@types/node": ">=24.0.0",
     "esbuild": "^0.27.2",
-    "ts-node": "^1.7.1",
     "typescript": "^5.3.3"
   }
 }

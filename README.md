@@ -73,12 +73,14 @@ Every template ships a `ketrics.config.json`. The App Deployment Lambda reads it
     { "code": "read", "description": "View application data" },
     { "code": "write", "description": "Create and modify application data" }
   ],
-  "functions": ["listItems", "createItem", "exportExcel"],
+  "functions": ["getPermissions", "listItems", "createItem", "exportExcel"],
   "environment": [
     { "name": "SOFTLAND_API_URL", "description": "Base URL of the ERP API" }
   ],
   "resources": {
-    "volume": [{ "code": "exports", "description": "Excel and PDF exports" }]
+    "documentdb": [{ "code": "app-data", "description": "Main data store" }],
+    "volume": [{ "code": "exports", "description": "Excel and PDF exports" }],
+    "connection": [{ "code": "main-db", "description": "SQL data connection" }]
   },
   "roles": [
     { "code": "viewer", "name": "Viewer", "actions": ["read"] }
@@ -91,10 +93,12 @@ Every template ships a `ketrics.config.json`. The App Deployment Lambda reads it
 | `actions`     | **Capabilities** (`read`, `write`, `export`) — the vocabulary roles grant and handlers check with `requirePermission`. Required. Never handler names. Each entry is a bare string or `{ code, description }`          |
 | `functions`   | Backend handler names exported from `backend/src/index.ts` (metadata)                                                                                                                                                |
 | `environment` | Environment variables the app reads via `ketrics.environment["NAME"]`. Created empty on deploy, existing values never overwritten. Mandatory while declared: undeletable and unrenameable in the portal, values editable |
-| `resources`   | `documentdb` / `volume` / `secret` entries. Each has a `code`, an optional `description`, and an optional `environmentVariable`                                                                                       |
+| `resources`   | Ketrics-managed resources under five kinds: `documentdb`, `volume`, `secret`, `parameter`, `connection`. Each has a `code`, an optional `description`, and an optional `environmentVariable`. Declaring one is what grants the app access to it |
 | `roles`       | Application roles to create. Every action a role lists must appear in the top-level `actions`                                                                                                                        |
 
-When a resource omits `environmentVariable`, the platform derives the name: uppercase the `code`, replace non-alphanumerics with `_`, then append `_DOCDB`, `_VOLUME` or `_SECRET` — `app-data` (documentdb) → `APP_DATA_DOCDB`, `exports` (volume) → `EXPORTS_VOLUME`, `stripe-key` (secret) → `STRIPE_KEY_SECRET`. A derived name does not need an `environment` entry. When `environmentVariable` is given, it must be declared in `environment`.
+When a resource omits `environmentVariable`, the platform derives the name: uppercase the `code`, replace non-alphanumerics with `_`, then append the kind's suffix — `app-data` (documentdb) → `APP_DATA_DOCDB`, `exports` (volume) → `EXPORTS_VOLUME`, `stripe-key` (secret) → `STRIPE_KEY_SECRET`, `billing-config` (parameter) → `BILLING_CONFIG_PARAMETER`, `main-db` (connection) → `MAIN_DB_CONNECTION`. A derived name does not need an `environment` entry. When `environmentVariable` is given, it must be declared in `environment`.
+
+The rule for choosing: if the value names a Ketrics-managed object of one of the five kinds, it is a `resources` entry (the portal renders a picker for it and deploy seeds the matching grant); if it is a plain value the app just needs — a threshold, a base URL, a flag — it is an `environment` entry. SQL data connections belong under `resources.connection`, which needs CLI >= 0.14.0.
 
 > **Renamed:** `environmentVariables` is now `environment`. The old key is rejected at deploy time rather than silently ignored.
 
@@ -110,8 +114,8 @@ The root `templates.json` is the registry consumed by `ketrics-cli`:
       "name": "HelloWorld",
       "description": "Complete reference app with all SDK features",
       "path": "templates/HelloWorld",
-      "minCliVersion": "0.5.0",
-      "minSdkVersion": "0.11.0",
+      "minCliVersion": "0.14.0",
+      "minSdkVersion": "0.17.0",
       "tags": ["full", "reference"]
     }
   ]

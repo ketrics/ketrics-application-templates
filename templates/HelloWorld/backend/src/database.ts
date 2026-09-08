@@ -6,11 +6,13 @@
  *
  * Supports PostgreSQL, MySQL, SQL Server, and Oracle databases.
  *
- * The connection code comes from the DATABASE_CONNECTION environment variable
- * declared in ketrics.config.json - never hardcode it.
+ * The connection code comes from MAIN_DB_CONNECTION, the variable derived from
+ * the resources.connection "main-db" declaration in ketrics.config.json - never
+ * hardcode it. Declaring the connection as a resource is what gives the portal
+ * a picker for it and auto-grants the app connection:{code}.
  */
 
-import { databaseConnectionCode } from "./config";
+import { mainDbConnectionCode } from "./helpers";
 import { requirePermission } from "./permissions";
 
 /**
@@ -19,7 +21,7 @@ import { requirePermission } from "./permissions";
 const queryUsers = async (payload: { limit?: number }) => {
   requirePermission("read");
 
-  const db = await ketrics.Database.connect(databaseConnectionCode());
+  const db = await ketrics.Database.connect(mainDbConnectionCode());
 
   try {
     const result = await db.query<{ id: number; name: string; email: string }>(
@@ -46,7 +48,7 @@ const insertRecord = async (payload: { name: string; email: string }) => {
     throw new Error("name and email are required");
   }
 
-  const db = await ketrics.Database.connect(databaseConnectionCode());
+  const db = await ketrics.Database.connect(mainDbConnectionCode());
 
   try {
     const result = await db.execute(
@@ -82,7 +84,7 @@ const transferFunds = async (payload: {
     throw new Error("Amount must be positive");
   }
 
-  const db = await ketrics.Database.connect(databaseConnectionCode());
+  const db = await ketrics.Database.connect(mainDbConnectionCode());
 
   try {
     const result = await db.transaction(async (tx) => {
