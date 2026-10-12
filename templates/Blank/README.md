@@ -82,7 +82,8 @@ ketrics deploy --env .env
 
 Plain `npm install -g @ketrics/ketrics-cli` on older Node does not fail — npm walks back to
 `0.1.0`, which ships a ZIP with no `ketrics.config.json` and still **reports success**, leaving the
-app with its previous actions, roles and variables. The included workflow pins `@^0.14`, uses
+app with its previous actions, roles and variables. The included workflow pins `@^0.15` (deploy uploads
+encrypted with the tenant's key need 0.15.0), uses
 `node-version: 24`, and the repo root carries `.npmrc` with `engine-strict=true`. After the first
 deploy, confirm the app's actions, roles and variables actually changed.
 

@@ -5,7 +5,7 @@
       "name": "HelloWorld",
       "description": "Complete reference app with all SDK features",
       "path": "templates/HelloWorld",
-      "minCliVersion": "0.14.0",
+      "minCliVersion": "0.15.0",
       "minSdkVersion": "0.17.0",
       "tags": ["full", "reference"]
     },
@@ -13,7 +13,7 @@
       "name": "Blank",
       "description": "Minimal app with just the essentials",
       "path": "templates/Blank",
-      "minCliVersion": "0.14.0",
+      "minCliVersion": "0.15.0",
       "minSdkVersion": "0.17.0",
       "tags": ["minimal", "starter"]
     }
