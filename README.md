@@ -114,7 +114,7 @@ The root `templates.json` is the registry consumed by `ketrics-cli`:
       "name": "HelloWorld",
       "description": "Complete reference app with all SDK features",
       "path": "templates/HelloWorld",
-      "minCliVersion": "0.14.0",
+      "minCliVersion": "0.15.0",
       "minSdkVersion": "0.17.0",
       "tags": ["full", "reference"]
     }

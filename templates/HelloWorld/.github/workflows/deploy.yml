@@ -31,7 +31,8 @@ jobs:
       # stays green. node-version 24 + this range + .npmrc engine-strict=true
       # are what prevent it. The parameter and connection resource kinds need
       # 0.14.0 or newer.
-      - run: npm install -g @ketrics/ketrics-cli@^0.14
+      # 0.15.0 or newer: deploy uploads are encrypted with the tenant's own KMS key.
+      - run: npm install -g @ketrics/ketrics-cli@^0.15
       - run: ketrics --version
 
       # Generate .env file (only KETRICS_TOKEN is a secret)

@@ -160,7 +160,7 @@ Add your template to the root `templates.json` manifest:
   "name": "YourTemplateName",
   "description": "Short description for the CLI selection menu",
   "path": "templates/YourTemplateName",
-  "minCliVersion": "0.14.0",
+  "minCliVersion": "0.15.0",
   "minSdkVersion": "0.17.0",
   "tags": ["your", "tags"]
 }
@@ -196,7 +196,7 @@ cd ../frontend && npm install && npm run build
 - **Include test files**: Add JSON test request files in the `tests/` directory for each backend function
 - **Don't include build artifacts**: Never commit `node_modules/`, `dist/`, or `package-lock.json`
 - **Pin SDK versions**: Use exact versions for `@ketrics/sdk-backend` in devDependencies
-- **Pin the CLI in the deploy workflow**: `@^0.14` with `node-version: 24` and `.npmrc` carrying `engine-strict=true`. Unpinned, npm walks back to `0.1.0` on older Node — that CLI ships a ZIP with no `ketrics.config.json` and still reports success, so the app silently keeps its old actions, roles and variables while CI stays green
+- **Pin the CLI in the deploy workflow**: `@^0.15` (uploads encrypted with the tenant's key need 0.15.0) with `node-version: 24` and `.npmrc` carrying `engine-strict=true`. Unpinned, npm walks back to `0.1.0` on older Node — that CLI ships a ZIP with no `ketrics.config.json` and still reports success, so the app silently keeps its old actions, roles and variables while CI stays green
 
 ## Pull Request Process
 
