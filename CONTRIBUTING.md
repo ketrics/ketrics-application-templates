@@ -15,6 +15,10 @@ templates/
     ├── .env.example           # Required: Environment variables template
     ├── .npmrc                 # Required: engine-strict=true
     ├── CLAUDE.md              # Required: Development instructions for the generated app
+    ├── .claude/
+    │   ├── settings.json      # Required: default model and permission rules for Claude Code
+    │   └── agents/
+    │       └── ketrics-implementer.md  # Required: the implementer agent (Claude Sonnet 5.5)
     ├── backend/
     │   ├── package.json
     │   ├── tsconfig.json
@@ -41,6 +45,8 @@ templates/
     │           └── mock-client.ts
     └── tests/                  # Optional: Test request JSON files
 ```
+
+The four sections between `<!-- shared:start -->` and `<!-- shared:end -->` in `CLAUDE.md` must be identical in every template; `scripts/validate-claude-docs.js` checks it.
 
 **Organize the backend into domain-oriented files from day one.** `index.ts` is a manifest — it
 imports handlers from domain files and re-exports them, and nothing else. esbuild bundles the whole
