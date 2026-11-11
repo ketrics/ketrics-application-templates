@@ -25,6 +25,7 @@
  * - ketrics.Parameter.get(code) (shared, unencrypted JSON config)
  * - ketrics.Excel.create() / ketrics.Excel.read(buffer) (Excel workbooks)
  * - ketrics.Pdf.create() / ketrics.Pdf.read(buffer) (PDF documents)
+ * - ketrics.Word.create() / ketrics.Word.read(buffer) (Word documents)
  * - ketrics.Job.runInBackground(params) (background job execution)
  * - ketrics.Messages.send(params) (user messaging)
  * - ketrics.Users.list() (tenant users)
@@ -80,6 +81,12 @@ import {
   exportDataToExcel,
 } from "./excel";
 
+// Word examples: create a document, read one back
+import {
+  createSimpleWord,
+  readWordDocument,
+} from "./word";
+
 // Secret management examples
 import { getSecret } from "./secrets";
 
@@ -123,6 +130,9 @@ export {
   // Excel
   createSpreadsheet,
   exportDataToExcel,
+  // Word
+  createSimpleWord,
+  readWordDocument,
   // Secrets
   getSecret,
   // Parameters

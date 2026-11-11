@@ -23,6 +23,7 @@ subsystem, using the same layout, guards and configuration rules a production ap
 │       ├── secrets.ts     # Encrypted secret examples
 │       ├── pdf.ts         # PDF generation examples
 │       ├── excel.ts       # Excel workbook examples
+│       ├── word.ts        # Word document examples
 │       ├── messages.ts    # User messaging examples
 │       ├── jobs.ts        # Background job examples
 │       └── http.ts        # HTTP client examples
@@ -71,6 +72,8 @@ and diff clarity. Co-locate helpers with the handlers that use them; only promot
 | `createInvoicePdf` | `export` | Generate an invoice-style PDF |
 | `createSpreadsheet` | `export` | Create an Excel workbook |
 | `exportDataToExcel` | `export` | Export data to a multi-sheet Excel file |
+| `createSimpleWord` | `export` | Generate a Word document (heading, list, table, footer) |
+| `readWordDocument` | `read` | Read a .docx from the volume and return its text and blocks |
 | `getSecret` | `read` | Retrieve an encrypted secret |
 | `getAppSettings` | `read` | Read shared JSON configuration from a Parameter |
 | `getOptionalAppSettings` | `read` | Read the same Parameter as optional config, with defaults |
@@ -107,6 +110,7 @@ ketrics.Secret          // .get(code) → encrypted secrets
 ketrics.Parameter       // .get(code) / .exists(code) → shared, unencrypted JSON config
 ketrics.Excel           // .create() / .read(buffer) → Excel workbooks
 ketrics.Pdf             // .create() / .read(buffer) → PDF documents
+ketrics.Word            // .create() / .read(buffer) → Word documents
 ketrics.Job             // .runInBackground(params) → async job execution
 ketrics.Messages        // .send(params) / .sendBulk(params) → user notifications
 ketrics.Users           // .list() → tenant users
@@ -162,9 +166,9 @@ compile error rather than a handler no role can reach.
 
 | Capability | Guards |
 | --- | --- |
-| `read` | `echo`, `info`, `getDocument`, `listDocuments`, `readFile`, `listFiles`, `generateDownloadUrl`, `queryUsers`, `getSecret`, `getAppSettings`, `getOptionalAppSettings`, `listUsers`, `getJobStatus`, `fetchExternalApi` |
+| `read` | `echo`, `info`, `getDocument`, `listDocuments`, `readFile`, `listFiles`, `generateDownloadUrl`, `readWordDocument`, `queryUsers`, `getSecret`, `getAppSettings`, `getOptionalAppSettings`, `listUsers`, `getJobStatus`, `fetchExternalApi` |
 | `write` | `createDocument`, `updateDocument`, `deleteDocument`, `saveFile`, `copyFile`, `insertRecord`, `sendNotification`, `sendBulkNotification`, `scheduleBackgroundJob` |
-| `export` | `createSimplePdf`, `createInvoicePdf`, `createSpreadsheet`, `exportDataToExcel` |
+| `export` | `createSimplePdf`, `createInvoicePdf`, `createSpreadsheet`, `exportDataToExcel`, `createSimpleWord` |
 | `approve` | `transferFunds` |
 
 `transferFunds` is guarded by `approve` rather than `write` on purpose: moving funds is a
@@ -187,7 +191,7 @@ application's Update form, so an admin selects an existing resource instead of t
 | Variable | Bound to | Used by |
 | --- | --- | --- |
 | `APP_DATA_DOCDB` | `resources.documentdb` code `app-data` (derived name) | the five `*Document` handlers |
-| `DEMO_VOLUME` | `resources.volume` code `test-volume` (explicit `environmentVariable`) | `saveFile`, `readFile`, `listFiles`, `generateDownloadUrl`, `copyFile`, both PDF handlers, both Excel handlers |
+| `DEMO_VOLUME` | `resources.volume` code `test-volume` (explicit `environmentVariable`) | `saveFile`, `readFile`, `listFiles`, `generateDownloadUrl`, `copyFile`, both PDF handlers, both Excel handlers, both Word handlers |
 | `APIKEY_SECRET` | `resources.secret` code `apikey` (derived name) | `getSecret` (unless the payload passes an explicit `code`) |
 | `APP_SETTINGS_PARAMETER` | `resources.parameter` code `app-settings` (derived name) | `getAppSettings`, `getOptionalAppSettings` |
 | `MAIN_DB_CONNECTION` | `resources.connection` code `main-db` (derived name) | `queryUsers`, `insertRecord`, `transferFunds` |
