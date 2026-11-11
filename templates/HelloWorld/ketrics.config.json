@@ -23,7 +23,7 @@
     },
     {
       "code": "export",
-      "description": "Generate PDF and Excel documents"
+      "description": "Generate PDF, Excel and Word documents"
     },
     {
       "code": "approve",
@@ -51,6 +51,8 @@
     "createSimplePdf",
     "createSpreadsheet",
     "exportDataToExcel",
+    "createSimpleWord",
+    "readWordDocument",
     "getSecret",
     "getAppSettings",
     "getOptionalAppSettings",
@@ -65,7 +67,7 @@
   "environment": [
     {
       "name": "DEMO_VOLUME",
-      "description": "Volume code used by the file, PDF and Excel handlers"
+      "description": "Volume code used by the file, PDF, Excel and Word handlers"
     },
     {
       "name": "DEBUG_LEVEL",
@@ -82,7 +84,7 @@
     "volume": [
       {
         "code": "test-volume",
-        "description": "Demo file storage for saved files, PDFs and spreadsheets",
+        "description": "Demo file storage for saved files, PDFs, spreadsheets and Word documents",
         "environmentVariable": "DEMO_VOLUME"
       }
     ],

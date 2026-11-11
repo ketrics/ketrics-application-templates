@@ -23,7 +23,7 @@ backend/src/
   database.ts            # SQL data connections
   parameters.ts          # shared JSON configuration
   secrets.ts             # encrypted secrets
-  pdf.ts  excel.ts       # document generation
+  pdf.ts  excel.ts  word.ts  # document generation (PDF, Excel, Word)
   messages.ts  jobs.ts   # notifications, background jobs
   http.ts                # external HTTP requests
 frontend/src/

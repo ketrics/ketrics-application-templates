@@ -191,6 +191,9 @@ function App() {
               <button onClick={() => handleDownload("exportDataToExcel")} className="button" disabled={loading}>
                 Export to Excel
               </button>
+              <button onClick={() => handleDownload("createSimpleWord")} className="button" disabled={loading}>
+                Create Word document
+              </button>
             </div>
           </div>
         )}
@@ -257,6 +260,7 @@ function App() {
           <li>Secret management (encrypted credentials)</li>
           <li>PDF document generation (simple and invoice-style)</li>
           <li>Excel workbook creation (single and multi-sheet)</li>
+          <li>Word document creation and reading (headings, lists, tables)</li>
           <li>User messaging and notifications</li>
           <li>Background job scheduling</li>
           <li>External HTTP requests</li>

@@ -9,7 +9,7 @@ Official starter templates for building applications on [Ketrics Cloud Analytics
 
 | Template       | Description                                                                                                                                                          | Tags                 |
 | -------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------- |
-| **HelloWorld** | Complete reference app demonstrating all SDK features including volumes, databases, PDF/Excel generation, secrets, messaging, background jobs, and HTTP integrations | `full`, `reference`  |
+| **HelloWorld** | Complete reference app demonstrating all SDK features including volumes, databases, PDF/Excel/Word generation, secrets, messaging, background jobs, and HTTP integrations | `full`, `reference`  |
 | **Blank**      | Minimal starter with a single echo handler — a clean starting point for new applications                                                                             | `minimal`, `starter` |
 
 ## Repository Structure
@@ -20,7 +20,7 @@ Official starter templates for building applications on [Ketrics Cloud Analytics
 │   ├── HelloWorld/             # Full-featured reference template
 │   │   ├── ketrics.config.json
 │   │   ├── template.json
-│   │   ├── backend/            # TypeScript handlers (volumes, database, PDF, Excel, etc.)
+│   │   ├── backend/            # TypeScript handlers (volumes, database, PDF, Excel, Word, etc.)
 │   │   ├── frontend/           # React + Vite frontend with mock handlers
 │   │   └── tests/              # Test request JSON files
 │   └── Blank/                  # Minimal starter template
